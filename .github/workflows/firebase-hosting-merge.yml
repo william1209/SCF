@@ -6,6 +6,8 @@ name: Deploy to Firebase Hosting on merge
   push:
     branches:
       - main
+    path:
+      - '**.md'
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -18,6 +20,14 @@ jobs:
           mdbook-version: 'latest'
       - name: Build
         run: mdbook build
+
+      - name: Render images for every Mermaid diagram in all Markdown files (*.md) in the repo
+        uses: nielsvaneck/render-md-mermaid@v2
+      - name: Commit rendered png and svg files
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: "*[.svg,.png]"
+          commit_message: automatically rendered mermaid diagrams
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
